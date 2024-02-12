@@ -1,14 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"fmt"
-	
+
 	"github.com/lutfiahdewi/graphql-go/graph"
 	database "github.com/lutfiahdewi/graphql-go/internal/pkg/db/mssql"
-
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -16,8 +15,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const defaultPort = "8080"
-
+const defaultPort = "8060"
 
 func main() {
 	port := os.Getenv("PORT")
@@ -25,16 +23,16 @@ func main() {
 		port = defaultPort
 	}
 
-	envErr := godotenv.Load();
+	envErr := godotenv.Load()
 	if envErr != nil {
-       fmt.Printf("Error loading credentials: %v \n", envErr)
-    }
+		fmt.Printf("Error loading credentials: %v \n", envErr)
+	}
 	var (
 		password = os.Getenv("MSSQL_DB_PASSWORD")
-		user = os.Getenv("MSSQL_DB_USER")
+		user     = os.Getenv("MSSQL_DB_USER")
 		// dbPort = os.Getenv("MSSQL_DB_PORT")
 		dbName = os.Getenv("MSSQL_DB_DATABASE")
-	 )
+	)
 
 	/*srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
@@ -46,9 +44,12 @@ func main() {
 	// router.Use(auth.Middleware())
 
 	connectionString := fmt.Sprintf("sqlserver://%s:%s@localhost?database=%s", user, password, dbName)
-	database.OpenDB(connectionString, false)
-	defer database.CloseDB()
-	// database.Migrate()
+	_, err := database.OpenDB(connectionString, false)
+	if err != nil {
+		fmt.Printf("Failed to make connection to the database :(\n")
+	}
+	// defer database.CloseDB()
+	database.Migrate()
 	// server := handler.NewDefaultServer(hackernews.NewExecutableSchema(hackernews.Config{Resolvers: &hackernews.Resolver{}}))
 	server := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))

@@ -1,0 +1,30 @@
+# Port
+If 8080 blocked, try any port that not in this list
+netsh interface ipv4 show excludedportrange protocol=tcp
+
+# Generate model
+If new object added, then new model need to generated. Run this code:
+go run github.com/99designs/gqlgen generate
+
+# Migrations
+## Create table migrations
+cd internal/pkg/db/migrations/
+migrate create -ext sql -dir mssql -seq create_users_table
+if already in the folder probably:
+migrate create -ext sql -seq create_users_table
+check docs in: https://github.com/golang-migrate/migrate
+## Run migrations
+  $ migrate -source file://path/to/migrations -database postgres://localhost:5432/database up 2
+  example for mysql:
+  $ migrate -database mysql://root:dbpass@/hackernews -path internal/pkg/db/migrations/mysql up
+
+  migrate -database sqlserver://ASUS:12345678@/sobat -path internal/pkg/db/migrations/mssql up
+  migrate -database sqlserver://ASUS:12345678@localhost:1433/sobat -path internal/pkg/db/migrations/mssql up
+  sqlserver://ASUS:12345678@localhost?database=sobat
+
+  Error migration: Dirty database version 1. Fix and force version. How to fix:
+  migrate -path PATH_TO_YOUR_MIGRATIONS -database YOUR_DATABASE_URL force VERSION
+  *change version with a number of force
+  migrate -database sqlserver://ASUS:12345678@localhost:1433/sobat -path internal/pkg/db/migrations/mssql up force 5
+
+# Auth

@@ -3,21 +3,22 @@ package mssql
 import (
 	"database/sql"
 	_ "github.com/microsoft/go-mssqldb"
-	/*"github.com/golang-migrate/migrate"
-	"github.com/golang-migrate/migrate/database/mysql"
-	_ "github.com/golang-migrate/migrate/source/file"*/
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/sqlserver"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"log"
 	"fmt"
 	"context"
 )
  
-var db *sql.DB
+var Db *sql.DB
 
 func OpenDB(connString string, setLimits bool) (*sql.DB, error) {
 	var err error
 	db, err := sql.Open("sqlserver", connString)
 	if err != nil {
 		log.Fatal("Error creating connection, message: ", err.Error())
+		return nil, err
 		// log.Panic(err)
 	}
 
@@ -32,17 +33,31 @@ func OpenDB(connString string, setLimits bool) (*sql.DB, error) {
 	err = db.PingContext(ctx)
 	if err != nil {
 		log.Fatal(err.Error())
+		return nil, err
 		// log.Panic(err)
 	}
 	fmt.Printf("Connected to SQL Server!\n")
+	Db = db;
 	return db, nil
 }
 
 func CloseDB() error {
-	return db.Close()
+	return Db.Close()
 }
 
 func Migrate() {
-	fmt.Println("This fun is not implemented yet")
-
+	//the cli doesnt work :/
+	// fmt.Println("This func is not implemented yet")
+	if err := Db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+	driver, _ := sqlserver.WithInstance(Db, &sqlserver.Config{})
+	m, _ := migrate.NewWithDatabaseInstance(
+		"file://internal/pkg/db/migrations/mssql",
+		"sqlserver",
+		driver,
+	)
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal(err)
+	}
 }
