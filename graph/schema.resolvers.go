@@ -7,15 +7,46 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/lutfiahdewi/graphql-go/graph/model"
+	"github.com/lutfiahdewi/graphql-go/internal/auth"
+	"github.com/lutfiahdewi/graphql-go/internal/kegiatans"
 	"github.com/lutfiahdewi/graphql-go/internal/users"
 	"github.com/lutfiahdewi/graphql-go/pkg/jwt"
 )
 
 // CreateLink is the resolver for the createLink field.
-func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	panic(fmt.Errorf("not implemented: CreateLink - createLink"))
+func (r *mutationResolver) CreateKegiatan(ctx context.Context, input model.NewKegiatan) (*model.Kegiatan, error) {
+	user := auth.ForContext(ctx)
+	if user == nil {
+		return &model.Kegiatan{}, fmt.Errorf("access denied")
+	}
+	
+	var kegiatan kegiatans.Kegiatan
+	kegiatan.Title = input.Title
+	kegiatan.Status = input.Status
+	kegiatan.User = user
+	graphqlUser := &model.User{
+		ID:   user.ID,
+		Name: user.Username,
+	}
+	/*kegiatan.User.ID = "4"
+	kegiatan.User.Username = "user dummy"
+	kegiatan.User.Password = "pswd123"*/
+	// kegiatan.User = &users.User{ID: "4", Username: "User Dummy"}
+	var id int64 = kegiatan.Create() //should re-query the inserted row(??)
+	return &model.Kegiatan{ID: strconv.FormatInt(id, 10), Title: kegiatan.Title, Status: kegiatan.Status, User: graphqlUser}, nil
+}
+
+// EditKegiatan is the resolver for the editKegiatan field.
+func (r *mutationResolver) EditKegiatan(ctx context.Context, input model.NewKegiatan) (*model.Kegiatan, error) {
+	panic(fmt.Errorf("not implemented: EditKegiatan - editKegiatan"))
+}
+
+// DeleteKegiatan is the resolver for the deleteKegiatan field.
+func (r *mutationResolver) DeleteKegiatan(ctx context.Context, input string) (string, error) {
+	panic(fmt.Errorf("not implemented: DeleteKegiatan - deleteKegiatan"))
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -33,17 +64,46 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+	var user users.User
+	user.Username = input.Username
+	user.Password = input.Password
+	correct := user.Authenticate()
+	if !correct {
+		// 1
+		return "", &users.WrongUsernameOrPasswordError{}
+	}
+	token, err := jwt.GenerateToken(user.Username)
+	if err != nil{
+		return "", err
+	}
+	return token, nil
 }
 
 // RefreshToken is the resolver for the refreshToken field.
 func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
-	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
+	username, err := jwt.ParseToken(input.Token)
+	if err != nil {
+		return "", fmt.Errorf("access denied")
+	}
+	token, err := jwt.GenerateToken(username)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
-// Links is the resolver for the links field.
-func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
-	panic(fmt.Errorf("not implemented: Links - links"))
+// Kegiatans is the resolver for the Kegiatans field.
+func (r *queryResolver) Kegiatans(ctx context.Context) ([]*model.Kegiatan, error) {
+	var resultKegiatans []*model.Kegiatan
+	var dbKegiatans []kegiatans.Kegiatan = kegiatans.GetAll()
+	for _, kegiatan := range dbKegiatans{
+		graphqlUser := &model.User{
+			ID:   kegiatan.User.ID,
+			Name: kegiatan.User.Username,
+		}
+		resultKegiatans = append(resultKegiatans, &model.Kegiatan{ID: kegiatan.ID, Title: kegiatan.Title, Status: kegiatan.Status, User: graphqlUser})
+	}
+	return resultKegiatans, nil
 }
 
 // Mutation returns MutationResolver implementation.

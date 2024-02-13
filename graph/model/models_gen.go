@@ -2,11 +2,11 @@
 
 package model
 
-type Link struct {
-	ID      string `json:"id"`
-	Title   string `json:"title"`
-	Address string `json:"address"`
-	User    *User  `json:"user"`
+type Kegiatan struct {
+	ID     string `json:"id"`
+	Title  string `json:"title"`
+	Status string `json:"status"`
+	User   *User  `json:"user"`
 }
 
 type Login struct {
@@ -17,9 +17,9 @@ type Login struct {
 type Mutation struct {
 }
 
-type NewLink struct {
-	Title   string `json:"title"`
-	Address string `json:"address"`
+type NewKegiatan struct {
+	Title  string `json:"title"`
+	Status string `json:"status"`
 }
 
 type NewUser struct {
@@ -32,13 +32,6 @@ type Query struct {
 
 type RefreshTokenInput struct {
 	Token string `json:"token"`
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
 }
 
 type User struct {

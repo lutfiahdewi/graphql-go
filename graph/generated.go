@@ -47,29 +47,24 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Link struct {
-		Address func(childComplexity int) int
-		ID      func(childComplexity int) int
-		Title   func(childComplexity int) int
-		User    func(childComplexity int) int
+	Kegiatan struct {
+		ID     func(childComplexity int) int
+		Status func(childComplexity int) int
+		Title  func(childComplexity int) int
+		User   func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateLink   func(childComplexity int, input model.NewLink) int
-		CreateUser   func(childComplexity int, input model.NewUser) int
-		Login        func(childComplexity int, input model.Login) int
-		RefreshToken func(childComplexity int, input model.RefreshTokenInput) int
+		CreateKegiatan func(childComplexity int, input model.NewKegiatan) int
+		CreateUser     func(childComplexity int, input model.NewUser) int
+		DeleteKegiatan func(childComplexity int, input string) int
+		EditKegiatan   func(childComplexity int, input model.NewKegiatan) int
+		Login          func(childComplexity int, input model.Login) int
+		RefreshToken   func(childComplexity int, input model.RefreshTokenInput) int
 	}
 
 	Query struct {
-		Links func(childComplexity int) int
-	}
-
-	Todo struct {
-		Done func(childComplexity int) int
-		ID   func(childComplexity int) int
-		Text func(childComplexity int) int
-		User func(childComplexity int) int
+		Kegiatans func(childComplexity int) int
 	}
 
 	User struct {
@@ -79,13 +74,15 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error)
+	CreateKegiatan(ctx context.Context, input model.NewKegiatan) (*model.Kegiatan, error)
+	EditKegiatan(ctx context.Context, input model.NewKegiatan) (*model.Kegiatan, error)
+	DeleteKegiatan(ctx context.Context, input string) (string, error)
 	CreateUser(ctx context.Context, input model.NewUser) (string, error)
 	Login(ctx context.Context, input model.Login) (string, error)
 	RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error)
 }
 type QueryResolver interface {
-	Links(ctx context.Context) ([]*model.Link, error)
+	Kegiatans(ctx context.Context) ([]*model.Kegiatan, error)
 }
 
 type executableSchema struct {
@@ -107,45 +104,45 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Link.address":
-		if e.complexity.Link.Address == nil {
+	case "Kegiatan.id":
+		if e.complexity.Kegiatan.ID == nil {
 			break
 		}
 
-		return e.complexity.Link.Address(childComplexity), true
+		return e.complexity.Kegiatan.ID(childComplexity), true
 
-	case "Link.id":
-		if e.complexity.Link.ID == nil {
+	case "Kegiatan.status":
+		if e.complexity.Kegiatan.Status == nil {
 			break
 		}
 
-		return e.complexity.Link.ID(childComplexity), true
+		return e.complexity.Kegiatan.Status(childComplexity), true
 
-	case "Link.title":
-		if e.complexity.Link.Title == nil {
+	case "Kegiatan.title":
+		if e.complexity.Kegiatan.Title == nil {
 			break
 		}
 
-		return e.complexity.Link.Title(childComplexity), true
+		return e.complexity.Kegiatan.Title(childComplexity), true
 
-	case "Link.user":
-		if e.complexity.Link.User == nil {
+	case "Kegiatan.user":
+		if e.complexity.Kegiatan.User == nil {
 			break
 		}
 
-		return e.complexity.Link.User(childComplexity), true
+		return e.complexity.Kegiatan.User(childComplexity), true
 
-	case "Mutation.createLink":
-		if e.complexity.Mutation.CreateLink == nil {
+	case "Mutation.createKegiatan":
+		if e.complexity.Mutation.CreateKegiatan == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createLink_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createKegiatan_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateLink(childComplexity, args["input"].(model.NewLink)), true
+		return e.complexity.Mutation.CreateKegiatan(childComplexity, args["input"].(model.NewKegiatan)), true
 
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
@@ -158,6 +155,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.NewUser)), true
+
+	case "Mutation.deleteKegiatan":
+		if e.complexity.Mutation.DeleteKegiatan == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteKegiatan_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteKegiatan(childComplexity, args["input"].(string)), true
+
+	case "Mutation.editKegiatan":
+		if e.complexity.Mutation.EditKegiatan == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_editKegiatan_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EditKegiatan(childComplexity, args["input"].(model.NewKegiatan)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -183,40 +204,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RefreshToken(childComplexity, args["input"].(model.RefreshTokenInput)), true
 
-	case "Query.links":
-		if e.complexity.Query.Links == nil {
+	case "Query.Kegiatans":
+		if e.complexity.Query.Kegiatans == nil {
 			break
 		}
 
-		return e.complexity.Query.Links(childComplexity), true
-
-	case "Todo.done":
-		if e.complexity.Todo.Done == nil {
-			break
-		}
-
-		return e.complexity.Todo.Done(childComplexity), true
-
-	case "Todo.id":
-		if e.complexity.Todo.ID == nil {
-			break
-		}
-
-		return e.complexity.Todo.ID(childComplexity), true
-
-	case "Todo.text":
-		if e.complexity.Todo.Text == nil {
-			break
-		}
-
-		return e.complexity.Todo.Text(childComplexity), true
-
-	case "Todo.user":
-		if e.complexity.Todo.User == nil {
-			break
-		}
-
-		return e.complexity.Todo.User(childComplexity), true
+		return e.complexity.Query.Kegiatans(childComplexity), true
 
 	case "User.id":
 		if e.complexity.User.ID == nil {
@@ -241,7 +234,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputLogin,
-		ec.unmarshalInputNewLink,
+		ec.unmarshalInputNewKegiatan,
 		ec.unmarshalInputNewUser,
 		ec.unmarshalInputRefreshTokenInput,
 	)
@@ -360,13 +353,13 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createLink_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createKegiatan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewLink
+	var arg0 model.NewKegiatan
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewLink2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewLink(ctx, tmp)
+		arg0, err = ec.unmarshalNNewKegiatan2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewKegiatan(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -382,6 +375,36 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewUser2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewUser(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteKegiatan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_editKegiatan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewKegiatan
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewKegiatan2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewKegiatan(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -473,8 +496,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Link_id(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_id(ctx, field)
+func (ec *executionContext) _Kegiatan_id(ctx context.Context, field graphql.CollectedField, obj *model.Kegiatan) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Kegiatan_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -504,9 +527,9 @@ func (ec *executionContext) _Link_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Kegiatan_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Link",
+		Object:     "Kegiatan",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -517,8 +540,8 @@ func (ec *executionContext) fieldContext_Link_id(ctx context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_title(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_title(ctx, field)
+func (ec *executionContext) _Kegiatan_title(ctx context.Context, field graphql.CollectedField, obj *model.Kegiatan) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Kegiatan_title(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -548,9 +571,9 @@ func (ec *executionContext) _Link_title(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Kegiatan_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Link",
+		Object:     "Kegiatan",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -561,8 +584,8 @@ func (ec *executionContext) fieldContext_Link_title(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_address(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_address(ctx, field)
+func (ec *executionContext) _Kegiatan_status(ctx context.Context, field graphql.CollectedField, obj *model.Kegiatan) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Kegiatan_status(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -575,7 +598,7 @@ func (ec *executionContext) _Link_address(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Address, nil
+		return obj.Status, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -592,9 +615,9 @@ func (ec *executionContext) _Link_address(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_address(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Kegiatan_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Link",
+		Object:     "Kegiatan",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -605,8 +628,8 @@ func (ec *executionContext) fieldContext_Link_address(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_user(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_user(ctx, field)
+func (ec *executionContext) _Kegiatan_user(ctx context.Context, field graphql.CollectedField, obj *model.Kegiatan) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Kegiatan_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -636,9 +659,9 @@ func (ec *executionContext) _Link_user(ctx context.Context, field graphql.Collec
 	return ec.marshalNUser2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Kegiatan_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Link",
+		Object:     "Kegiatan",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -655,8 +678,8 @@ func (ec *executionContext) fieldContext_Link_user(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createLink(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createLink(ctx, field)
+func (ec *executionContext) _Mutation_createKegiatan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createKegiatan(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -669,7 +692,7 @@ func (ec *executionContext) _Mutation_createLink(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateLink(rctx, fc.Args["input"].(model.NewLink))
+		return ec.resolvers.Mutation().CreateKegiatan(rctx, fc.Args["input"].(model.NewKegiatan))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -681,12 +704,12 @@ func (ec *executionContext) _Mutation_createLink(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Link)
+	res := resTmp.(*model.Kegiatan)
 	fc.Result = res
-	return ec.marshalNLink2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐLink(ctx, field.Selections, res)
+	return ec.marshalNKegiatan2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatan(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createKegiatan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -695,15 +718,15 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Link_id(ctx, field)
+				return ec.fieldContext_Kegiatan_id(ctx, field)
 			case "title":
-				return ec.fieldContext_Link_title(ctx, field)
-			case "address":
-				return ec.fieldContext_Link_address(ctx, field)
+				return ec.fieldContext_Kegiatan_title(ctx, field)
+			case "status":
+				return ec.fieldContext_Kegiatan_status(ctx, field)
 			case "user":
-				return ec.fieldContext_Link_user(ctx, field)
+				return ec.fieldContext_Kegiatan_user(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Kegiatan", field.Name)
 		},
 	}
 	defer func() {
@@ -713,7 +736,127 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createLink_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createKegiatan_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_editKegiatan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_editKegiatan(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EditKegiatan(rctx, fc.Args["input"].(model.NewKegiatan))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Kegiatan)
+	fc.Result = res
+	return ec.marshalNKegiatan2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatan(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_editKegiatan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Kegiatan_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Kegiatan_title(ctx, field)
+			case "status":
+				return ec.fieldContext_Kegiatan_status(ctx, field)
+			case "user":
+				return ec.fieldContext_Kegiatan_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Kegiatan", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_editKegiatan_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteKegiatan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteKegiatan(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteKegiatan(rctx, fc.Args["input"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteKegiatan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteKegiatan_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -885,8 +1028,8 @@ func (ec *executionContext) fieldContext_Mutation_refreshToken(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_links(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_links(ctx, field)
+func (ec *executionContext) _Query_Kegiatans(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_Kegiatans(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -899,7 +1042,7 @@ func (ec *executionContext) _Query_links(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Links(rctx)
+		return ec.resolvers.Query().Kegiatans(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -911,12 +1054,12 @@ func (ec *executionContext) _Query_links(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Link)
+	res := resTmp.([]*model.Kegiatan)
 	fc.Result = res
-	return ec.marshalNLink2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐLinkᚄ(ctx, field.Selections, res)
+	return ec.marshalNKegiatan2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatanᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_links(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_Kegiatans(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -925,15 +1068,15 @@ func (ec *executionContext) fieldContext_Query_links(ctx context.Context, field 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Link_id(ctx, field)
+				return ec.fieldContext_Kegiatan_id(ctx, field)
 			case "title":
-				return ec.fieldContext_Link_title(ctx, field)
-			case "address":
-				return ec.fieldContext_Link_address(ctx, field)
+				return ec.fieldContext_Kegiatan_title(ctx, field)
+			case "status":
+				return ec.fieldContext_Kegiatan_status(ctx, field)
 			case "user":
-				return ec.fieldContext_Link_user(ctx, field)
+				return ec.fieldContext_Kegiatan_user(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Kegiatan", field.Name)
 		},
 	}
 	return fc, nil
@@ -1063,188 +1206,6 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Todo_id(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Todo_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Todo_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Todo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Todo_text(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Todo_text(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Text, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Todo_text(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Todo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Todo_done(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Todo_done(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Done, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Todo_done(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Todo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.CollectedField, obj *model.Todo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Todo_user(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Todo_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Todo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -3145,14 +3106,14 @@ func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interfa
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj interface{}) (model.NewLink, error) {
-	var it model.NewLink
+func (ec *executionContext) unmarshalInputNewKegiatan(ctx context.Context, obj interface{}) (model.NewKegiatan, error) {
+	var it model.NewKegiatan
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "address"}
+	fieldsInOrder := [...]string{"title", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3166,13 +3127,13 @@ func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Title = data
-		case "address":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Address = data
+			it.Status = data
 		}
 	}
 
@@ -3248,34 +3209,34 @@ func (ec *executionContext) unmarshalInputRefreshTokenInput(ctx context.Context,
 
 // region    **************************** object.gotpl ****************************
 
-var linkImplementors = []string{"Link"}
+var kegiatanImplementors = []string{"Kegiatan"}
 
-func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj *model.Link) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, linkImplementors)
+func (ec *executionContext) _Kegiatan(ctx context.Context, sel ast.SelectionSet, obj *model.Kegiatan) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, kegiatanImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Link")
+			out.Values[i] = graphql.MarshalString("Kegiatan")
 		case "id":
-			out.Values[i] = ec._Link_id(ctx, field, obj)
+			out.Values[i] = ec._Kegiatan_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "title":
-			out.Values[i] = ec._Link_title(ctx, field, obj)
+			out.Values[i] = ec._Kegiatan_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "address":
-			out.Values[i] = ec._Link_address(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._Kegiatan_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "user":
-			out.Values[i] = ec._Link_user(ctx, field, obj)
+			out.Values[i] = ec._Kegiatan_user(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3321,9 +3282,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createLink":
+		case "createKegiatan":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createLink(ctx, field)
+				return ec._Mutation_createKegiatan(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "editKegiatan":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_editKegiatan(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteKegiatan":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteKegiatan(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -3391,7 +3366,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "links":
+		case "Kegiatans":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3400,7 +3375,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_links(ctx, field)
+				res = ec._Query_Kegiatans(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3421,60 +3396,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var todoImplementors = []string{"Todo"}
-
-func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj *model.Todo) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, todoImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Todo")
-		case "id":
-			out.Values[i] = ec._Todo_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "text":
-			out.Values[i] = ec._Todo_text(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "done":
-			out.Values[i] = ec._Todo_done(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "user":
-			out.Values[i] = ec._Todo_user(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3898,11 +3819,11 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNLink2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐLink(ctx context.Context, sel ast.SelectionSet, v model.Link) graphql.Marshaler {
-	return ec._Link(ctx, sel, &v)
+func (ec *executionContext) marshalNKegiatan2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatan(ctx context.Context, sel ast.SelectionSet, v model.Kegiatan) graphql.Marshaler {
+	return ec._Kegiatan(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNLink2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐLinkᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Link) graphql.Marshaler {
+func (ec *executionContext) marshalNKegiatan2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatanᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Kegiatan) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3926,7 +3847,7 @@ func (ec *executionContext) marshalNLink2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgrap
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNLink2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐLink(ctx, sel, v[i])
+			ret[i] = ec.marshalNKegiatan2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatan(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3946,14 +3867,14 @@ func (ec *executionContext) marshalNLink2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgrap
 	return ret
 }
 
-func (ec *executionContext) marshalNLink2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐLink(ctx context.Context, sel ast.SelectionSet, v *model.Link) graphql.Marshaler {
+func (ec *executionContext) marshalNKegiatan2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatan(ctx context.Context, sel ast.SelectionSet, v *model.Kegiatan) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Link(ctx, sel, v)
+	return ec._Kegiatan(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
@@ -3961,8 +3882,8 @@ func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋlutfiahdewiᚋgraphql
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewLink2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewLink(ctx context.Context, v interface{}) (model.NewLink, error) {
-	res, err := ec.unmarshalInputNewLink(ctx, v)
+func (ec *executionContext) unmarshalNNewKegiatan2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewKegiatan(ctx context.Context, v interface{}) (model.NewKegiatan, error) {
+	res, err := ec.unmarshalInputNewKegiatan(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

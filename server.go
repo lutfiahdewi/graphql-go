@@ -8,6 +8,7 @@ import (
 
 	"github.com/lutfiahdewi/graphql-go/graph"
 	database "github.com/lutfiahdewi/graphql-go/internal/pkg/db/mssql"
+	"github.com/lutfiahdewi/graphql-go/internal/auth"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -41,7 +42,7 @@ func main() {
 
 	router := chi.NewRouter()
 
-	// router.Use(auth.Middleware())
+	router.Use(auth.Middleware())
 
 	connectionString := fmt.Sprintf("sqlserver://%s:%s@localhost?database=%s", user, password, dbName)
 	_, err := database.OpenDB(connectionString, false)

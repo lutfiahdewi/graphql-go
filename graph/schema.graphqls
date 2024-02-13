@@ -4,10 +4,10 @@
 
 
 
-type Link {
+type Kegiatan {
   id: ID!
   title: String!
-  address: String!
+  status: String!
   user: User!
 }
 
@@ -17,12 +17,12 @@ type User {
 }
 
 type Query {
-  links: [Link!]!
+  Kegiatans: [Kegiatan!]!
 }
 
-input NewLink {
+input NewKegiatan {
   title: String!
-  address: String!
+  status: String!
 }
 
 input RefreshTokenInput{
@@ -40,7 +40,9 @@ input Login {
 }
 
 type Mutation {
-  createLink(input: NewLink!): Link!
+  createKegiatan(input: NewKegiatan!): Kegiatan!
+  editKegiatan(input: NewKegiatan!): Kegiatan!
+  deleteKegiatan(input: ID!): String!
   createUser(input: NewUser!): String!
   login(input: Login!): String!
   # we'll talk about this in authentication section
