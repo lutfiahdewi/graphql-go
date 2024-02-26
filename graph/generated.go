@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -55,34 +56,60 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateKegiatan func(childComplexity int, input model.NewKegiatan) int
-		CreateUser     func(childComplexity int, input model.NewUser) int
-		DeleteKegiatan func(childComplexity int, input string) int
-		EditKegiatan   func(childComplexity int, input model.NewKegiatan) int
-		Login          func(childComplexity int, input model.Login) int
-		RefreshToken   func(childComplexity int, input model.RefreshTokenInput) int
+		CreateKegiatan   func(childComplexity int, input model.NewKegiatan) int
+		CreateTKegSurvei func(childComplexity int, input model.NewTKegSurvei) int
+		CreateUser       func(childComplexity int, input model.NewUser) int
+		DeleteTKegSurvei func(childComplexity int, input string) int
+		EditTKegSurvei   func(childComplexity int, input model.EditTKegSurvei) int
+		Login            func(childComplexity int, input model.Login) int
+		RefreshToken     func(childComplexity int, input model.RefreshTokenInput) int
 	}
 
 	Query struct {
-		Kegiatans func(childComplexity int) int
+		Kegiatan   func(childComplexity int, input []string) int
+		Kegiatans  func(childComplexity int) int
+		TKegSurvei func(childComplexity int) int
 	}
 
 	User struct {
 		ID   func(childComplexity int) int
 		Name func(childComplexity int) int
 	}
+
+	TKegSurvei struct {
+		CreatedAt      func(childComplexity int) int
+		CreatedBy      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		IsAddIndicator func(childComplexity int) int
+		IsConfirm      func(childComplexity int) int
+		IsMulti        func(childComplexity int) int
+		IsRekrutmen    func(childComplexity int) int
+		KegKd          func(childComplexity int) int
+		Status         func(childComplexity int) int
+		SurveiKd       func(childComplexity int) int
+		TglBuka        func(childComplexity int) int
+		TglMulai       func(childComplexity int) int
+		TglRekMulai    func(childComplexity int) int
+		TglRekSelesai  func(childComplexity int) int
+		TglSelesai     func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
+		UpdatedBy      func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
 	CreateKegiatan(ctx context.Context, input model.NewKegiatan) (*model.Kegiatan, error)
-	EditKegiatan(ctx context.Context, input model.NewKegiatan) (*model.Kegiatan, error)
-	DeleteKegiatan(ctx context.Context, input string) (string, error)
 	CreateUser(ctx context.Context, input model.NewUser) (string, error)
 	Login(ctx context.Context, input model.Login) (string, error)
 	RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error)
+	CreateTKegSurvei(ctx context.Context, input model.NewTKegSurvei) (*model.TKegSurvei, error)
+	EditTKegSurvei(ctx context.Context, input model.EditTKegSurvei) (*model.TKegSurvei, error)
+	DeleteTKegSurvei(ctx context.Context, input string) (string, error)
 }
 type QueryResolver interface {
+	Kegiatan(ctx context.Context, input []string) ([]*model.Kegiatan, error)
 	Kegiatans(ctx context.Context) ([]*model.Kegiatan, error)
+	TKegSurvei(ctx context.Context) ([]*model.TKegSurvei, error)
 }
 
 type executableSchema struct {
@@ -144,6 +171,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateKegiatan(childComplexity, args["input"].(model.NewKegiatan)), true
 
+	case "Mutation.createTKegSurvei":
+		if e.complexity.Mutation.CreateTKegSurvei == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTKegSurvei_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTKegSurvei(childComplexity, args["input"].(model.NewTKegSurvei)), true
+
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
 			break
@@ -156,29 +195,29 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.NewUser)), true
 
-	case "Mutation.deleteKegiatan":
-		if e.complexity.Mutation.DeleteKegiatan == nil {
+	case "Mutation.deleteTKegSurvei":
+		if e.complexity.Mutation.DeleteTKegSurvei == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteKegiatan_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteTKegSurvei_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteKegiatan(childComplexity, args["input"].(string)), true
+		return e.complexity.Mutation.DeleteTKegSurvei(childComplexity, args["input"].(string)), true
 
-	case "Mutation.editKegiatan":
-		if e.complexity.Mutation.EditKegiatan == nil {
+	case "Mutation.editTKegSurvei":
+		if e.complexity.Mutation.EditTKegSurvei == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_editKegiatan_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_editTKegSurvei_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EditKegiatan(childComplexity, args["input"].(model.NewKegiatan)), true
+		return e.complexity.Mutation.EditTKegSurvei(childComplexity, args["input"].(model.EditTKegSurvei)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -204,12 +243,31 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RefreshToken(childComplexity, args["input"].(model.RefreshTokenInput)), true
 
+	case "Query.Kegiatan":
+		if e.complexity.Query.Kegiatan == nil {
+			break
+		}
+
+		args, err := ec.field_Query_Kegiatan_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Kegiatan(childComplexity, args["input"].([]string)), true
+
 	case "Query.Kegiatans":
 		if e.complexity.Query.Kegiatans == nil {
 			break
 		}
 
 		return e.complexity.Query.Kegiatans(childComplexity), true
+
+	case "Query.tKegSurvei":
+		if e.complexity.Query.TKegSurvei == nil {
+			break
+		}
+
+		return e.complexity.Query.TKegSurvei(childComplexity), true
 
 	case "User.id":
 		if e.complexity.User.ID == nil {
@@ -225,6 +283,125 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Name(childComplexity), true
 
+	case "tKegSurvei.created_at":
+		if e.complexity.TKegSurvei.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.CreatedAt(childComplexity), true
+
+	case "tKegSurvei.created_by":
+		if e.complexity.TKegSurvei.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.CreatedBy(childComplexity), true
+
+	case "tKegSurvei.id":
+		if e.complexity.TKegSurvei.ID == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.ID(childComplexity), true
+
+	case "tKegSurvei.is_add_indicator":
+		if e.complexity.TKegSurvei.IsAddIndicator == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.IsAddIndicator(childComplexity), true
+
+	case "tKegSurvei.is_confirm":
+		if e.complexity.TKegSurvei.IsConfirm == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.IsConfirm(childComplexity), true
+
+	case "tKegSurvei.is_multi":
+		if e.complexity.TKegSurvei.IsMulti == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.IsMulti(childComplexity), true
+
+	case "tKegSurvei.is_rekrutmen":
+		if e.complexity.TKegSurvei.IsRekrutmen == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.IsRekrutmen(childComplexity), true
+
+	case "tKegSurvei.keg_kd":
+		if e.complexity.TKegSurvei.KegKd == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.KegKd(childComplexity), true
+
+	case "tKegSurvei.status":
+		if e.complexity.TKegSurvei.Status == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.Status(childComplexity), true
+
+	case "tKegSurvei.survei_kd":
+		if e.complexity.TKegSurvei.SurveiKd == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.SurveiKd(childComplexity), true
+
+	case "tKegSurvei.tgl_buka":
+		if e.complexity.TKegSurvei.TglBuka == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.TglBuka(childComplexity), true
+
+	case "tKegSurvei.tgl_mulai":
+		if e.complexity.TKegSurvei.TglMulai == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.TglMulai(childComplexity), true
+
+	case "tKegSurvei.tgl_rek_mulai":
+		if e.complexity.TKegSurvei.TglRekMulai == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.TglRekMulai(childComplexity), true
+
+	case "tKegSurvei.tgl_rek_selesai":
+		if e.complexity.TKegSurvei.TglRekSelesai == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.TglRekSelesai(childComplexity), true
+
+	case "tKegSurvei.tgl_selesai":
+		if e.complexity.TKegSurvei.TglSelesai == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.TglSelesai(childComplexity), true
+
+	case "tKegSurvei.updated_at":
+		if e.complexity.TKegSurvei.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.UpdatedAt(childComplexity), true
+
+	case "tKegSurvei.updated_by":
+		if e.complexity.TKegSurvei.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.TKegSurvei.UpdatedBy(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -233,8 +410,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputEditTKegSurvei,
 		ec.unmarshalInputLogin,
 		ec.unmarshalInputNewKegiatan,
+		ec.unmarshalInputNewTKegSurvei,
 		ec.unmarshalInputNewUser,
 		ec.unmarshalInputRefreshTokenInput,
 	)
@@ -368,6 +547,21 @@ func (ec *executionContext) field_Mutation_createKegiatan_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createTKegSurvei_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewTKegSurvei
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewTKegSurvei2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewTKegSurvei(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -383,7 +577,7 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteKegiatan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteTKegSurvei_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -398,13 +592,13 @@ func (ec *executionContext) field_Mutation_deleteKegiatan_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_editKegiatan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_editTKegSurvei_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewKegiatan
+	var arg0 model.EditTKegSurvei
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewKegiatan2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewKegiatan(ctx, tmp)
+		arg0, err = ec.unmarshalNEditTKegSurvei2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐEditTKegSurvei(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -435,6 +629,21 @@ func (ec *executionContext) field_Mutation_refreshToken_args(ctx context.Context
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNRefreshTokenInput2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐRefreshTokenInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_Kegiatan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNID2ᚕstringᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -743,126 +952,6 @@ func (ec *executionContext) fieldContext_Mutation_createKegiatan(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_editKegiatan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_editKegiatan(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EditKegiatan(rctx, fc.Args["input"].(model.NewKegiatan))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Kegiatan)
-	fc.Result = res
-	return ec.marshalNKegiatan2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatan(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_editKegiatan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Kegiatan_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Kegiatan_title(ctx, field)
-			case "status":
-				return ec.fieldContext_Kegiatan_status(ctx, field)
-			case "user":
-				return ec.fieldContext_Kegiatan_user(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Kegiatan", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_editKegiatan_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteKegiatan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteKegiatan(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteKegiatan(rctx, fc.Args["input"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteKegiatan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteKegiatan_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createUser(ctx, field)
 	if err != nil {
@@ -1028,6 +1117,308 @@ func (ec *executionContext) fieldContext_Mutation_refreshToken(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createTKegSurvei(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTKegSurvei(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTKegSurvei(rctx, fc.Args["input"].(model.NewTKegSurvei))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TKegSurvei)
+	fc.Result = res
+	return ec.marshalNtKegSurvei2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTKegSurvei(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_tKegSurvei_id(ctx, field)
+			case "survei_kd":
+				return ec.fieldContext_tKegSurvei_survei_kd(ctx, field)
+			case "keg_kd":
+				return ec.fieldContext_tKegSurvei_keg_kd(ctx, field)
+			case "status":
+				return ec.fieldContext_tKegSurvei_status(ctx, field)
+			case "tgl_buka":
+				return ec.fieldContext_tKegSurvei_tgl_buka(ctx, field)
+			case "tgl_rek_mulai":
+				return ec.fieldContext_tKegSurvei_tgl_rek_mulai(ctx, field)
+			case "tgl_rek_selesai":
+				return ec.fieldContext_tKegSurvei_tgl_rek_selesai(ctx, field)
+			case "tgl_mulai":
+				return ec.fieldContext_tKegSurvei_tgl_mulai(ctx, field)
+			case "tgl_selesai":
+				return ec.fieldContext_tKegSurvei_tgl_selesai(ctx, field)
+			case "is_rekrutmen":
+				return ec.fieldContext_tKegSurvei_is_rekrutmen(ctx, field)
+			case "is_multi":
+				return ec.fieldContext_tKegSurvei_is_multi(ctx, field)
+			case "is_confirm":
+				return ec.fieldContext_tKegSurvei_is_confirm(ctx, field)
+			case "is_add_indicator":
+				return ec.fieldContext_tKegSurvei_is_add_indicator(ctx, field)
+			case "created_by":
+				return ec.fieldContext_tKegSurvei_created_by(ctx, field)
+			case "created_at":
+				return ec.fieldContext_tKegSurvei_created_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_tKegSurvei_updated_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_tKegSurvei_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type tKegSurvei", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTKegSurvei_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_editTKegSurvei(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_editTKegSurvei(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EditTKegSurvei(rctx, fc.Args["input"].(model.EditTKegSurvei))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TKegSurvei)
+	fc.Result = res
+	return ec.marshalNtKegSurvei2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_editTKegSurvei(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_tKegSurvei_id(ctx, field)
+			case "survei_kd":
+				return ec.fieldContext_tKegSurvei_survei_kd(ctx, field)
+			case "keg_kd":
+				return ec.fieldContext_tKegSurvei_keg_kd(ctx, field)
+			case "status":
+				return ec.fieldContext_tKegSurvei_status(ctx, field)
+			case "tgl_buka":
+				return ec.fieldContext_tKegSurvei_tgl_buka(ctx, field)
+			case "tgl_rek_mulai":
+				return ec.fieldContext_tKegSurvei_tgl_rek_mulai(ctx, field)
+			case "tgl_rek_selesai":
+				return ec.fieldContext_tKegSurvei_tgl_rek_selesai(ctx, field)
+			case "tgl_mulai":
+				return ec.fieldContext_tKegSurvei_tgl_mulai(ctx, field)
+			case "tgl_selesai":
+				return ec.fieldContext_tKegSurvei_tgl_selesai(ctx, field)
+			case "is_rekrutmen":
+				return ec.fieldContext_tKegSurvei_is_rekrutmen(ctx, field)
+			case "is_multi":
+				return ec.fieldContext_tKegSurvei_is_multi(ctx, field)
+			case "is_confirm":
+				return ec.fieldContext_tKegSurvei_is_confirm(ctx, field)
+			case "is_add_indicator":
+				return ec.fieldContext_tKegSurvei_is_add_indicator(ctx, field)
+			case "created_by":
+				return ec.fieldContext_tKegSurvei_created_by(ctx, field)
+			case "created_at":
+				return ec.fieldContext_tKegSurvei_created_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_tKegSurvei_updated_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_tKegSurvei_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type tKegSurvei", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_editTKegSurvei_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteTKegSurvei(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTKegSurvei(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTKegSurvei(rctx, fc.Args["input"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTKegSurvei(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTKegSurvei_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_Kegiatan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_Kegiatan(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Kegiatan(rctx, fc.Args["input"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Kegiatan)
+	fc.Result = res
+	return ec.marshalNKegiatan2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐKegiatanᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_Kegiatan(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Kegiatan_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Kegiatan_title(ctx, field)
+			case "status":
+				return ec.fieldContext_Kegiatan_status(ctx, field)
+			case "user":
+				return ec.fieldContext_Kegiatan_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Kegiatan", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_Kegiatan_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_Kegiatans(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_Kegiatans(ctx, field)
 	if err != nil {
@@ -1077,6 +1468,86 @@ func (ec *executionContext) fieldContext_Query_Kegiatans(ctx context.Context, fi
 				return ec.fieldContext_Kegiatan_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kegiatan", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_tKegSurvei(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_tKegSurvei(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TKegSurvei(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TKegSurvei)
+	fc.Result = res
+	return ec.marshalNtKegSurvei2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_tKegSurvei(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_tKegSurvei_id(ctx, field)
+			case "survei_kd":
+				return ec.fieldContext_tKegSurvei_survei_kd(ctx, field)
+			case "keg_kd":
+				return ec.fieldContext_tKegSurvei_keg_kd(ctx, field)
+			case "status":
+				return ec.fieldContext_tKegSurvei_status(ctx, field)
+			case "tgl_buka":
+				return ec.fieldContext_tKegSurvei_tgl_buka(ctx, field)
+			case "tgl_rek_mulai":
+				return ec.fieldContext_tKegSurvei_tgl_rek_mulai(ctx, field)
+			case "tgl_rek_selesai":
+				return ec.fieldContext_tKegSurvei_tgl_rek_selesai(ctx, field)
+			case "tgl_mulai":
+				return ec.fieldContext_tKegSurvei_tgl_mulai(ctx, field)
+			case "tgl_selesai":
+				return ec.fieldContext_tKegSurvei_tgl_selesai(ctx, field)
+			case "is_rekrutmen":
+				return ec.fieldContext_tKegSurvei_is_rekrutmen(ctx, field)
+			case "is_multi":
+				return ec.fieldContext_tKegSurvei_is_multi(ctx, field)
+			case "is_confirm":
+				return ec.fieldContext_tKegSurvei_is_confirm(ctx, field)
+			case "is_add_indicator":
+				return ec.fieldContext_tKegSurvei_is_add_indicator(ctx, field)
+			case "created_by":
+				return ec.fieldContext_tKegSurvei_created_by(ctx, field)
+			case "created_at":
+				return ec.fieldContext_tKegSurvei_created_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_tKegSurvei_updated_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_tKegSurvei_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type tKegSurvei", field.Name)
 		},
 	}
 	return fc, nil
@@ -3068,9 +3539,845 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _tKegSurvei_id(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_survei_kd(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_survei_kd(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SurveiKd, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_survei_kd(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_keg_kd(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_keg_kd(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.KegKd, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_keg_kd(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_status(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_tgl_buka(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_tgl_buka(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TglBuka, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_tgl_buka(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_tgl_rek_mulai(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_tgl_rek_mulai(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TglRekMulai, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_tgl_rek_mulai(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_tgl_rek_selesai(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_tgl_rek_selesai(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TglRekSelesai, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_tgl_rek_selesai(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_tgl_mulai(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_tgl_mulai(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TglMulai, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_tgl_mulai(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_tgl_selesai(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_tgl_selesai(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TglSelesai, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_tgl_selesai(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_is_rekrutmen(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_is_rekrutmen(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRekrutmen, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_is_rekrutmen(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_is_multi(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_is_multi(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsMulti, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_is_multi(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_is_confirm(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_is_confirm(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsConfirm, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_is_confirm(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_is_add_indicator(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_is_add_indicator(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsAddIndicator, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_is_add_indicator(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_created_by(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_created_by(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_created_at(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_created_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_updated_by(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _tKegSurvei_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.TKegSurvei) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_tKegSurvei_updated_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_tKegSurvei_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "tKegSurvei",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
+
+func (ec *executionContext) unmarshalInputEditTKegSurvei(ctx context.Context, obj interface{}) (model.EditTKegSurvei, error) {
+	var it model.EditTKegSurvei
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "survei_kd", "keg_kd", "status", "tgl_buka", "tgl_rek_mulai", "tgl_rek_selesai", "tgl_mulai", "tgl_selesai", "is_rekrutmen", "is_multi", "is_confirm", "is_add_indicator", "updated_by"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "survei_kd":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("survei_kd"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SurveiKd = data
+		case "keg_kd":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keg_kd"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.KegKd = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "tgl_buka":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_buka"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglBuka = data
+		case "tgl_rek_mulai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_rek_mulai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglRekMulai = data
+		case "tgl_rek_selesai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_rek_selesai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglRekSelesai = data
+		case "tgl_mulai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_mulai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglMulai = data
+		case "tgl_selesai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_selesai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglSelesai = data
+		case "is_rekrutmen":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_rekrutmen"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsRekrutmen = data
+		case "is_multi":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_multi"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsMulti = data
+		case "is_confirm":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_confirm"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsConfirm = data
+		case "is_add_indicator":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_add_indicator"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsAddIndicator = data
+		case "updated_by":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updated_by"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
 
 func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interface{}) (model.Login, error) {
 	var it model.Login
@@ -3134,6 +4441,117 @@ func (ec *executionContext) unmarshalInputNewKegiatan(ctx context.Context, obj i
 				return it, err
 			}
 			it.Status = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewTKegSurvei(ctx context.Context, obj interface{}) (model.NewTKegSurvei, error) {
+	var it model.NewTKegSurvei
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"survei_kd", "keg_kd", "status", "tgl_buka", "tgl_rek_mulai", "tgl_rek_selesai", "tgl_mulai", "tgl_selesai", "is_rekrutmen", "is_multi", "is_confirm", "is_add_indicator", "created_by"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "survei_kd":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("survei_kd"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SurveiKd = data
+		case "keg_kd":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keg_kd"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.KegKd = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "tgl_buka":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_buka"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglBuka = data
+		case "tgl_rek_mulai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_rek_mulai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglRekMulai = data
+		case "tgl_rek_selesai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_rek_selesai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglRekSelesai = data
+		case "tgl_mulai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_mulai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglMulai = data
+		case "tgl_selesai":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tgl_selesai"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TglSelesai = data
+		case "is_rekrutmen":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_rekrutmen"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsRekrutmen = data
+		case "is_multi":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_multi"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsMulti = data
+		case "is_confirm":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_confirm"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsConfirm = data
+		case "is_add_indicator":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_add_indicator"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsAddIndicator = data
+		case "created_by":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("created_by"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
 		}
 	}
 
@@ -3289,20 +4707,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "editKegiatan":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_editKegiatan(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteKegiatan":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteKegiatan(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUser(ctx, field)
@@ -3320,6 +4724,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "refreshToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_refreshToken(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createTKegSurvei":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTKegSurvei(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "editTKegSurvei":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_editTKegSurvei(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteTKegSurvei":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTKegSurvei(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -3366,6 +4791,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "Kegiatan":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_Kegiatan(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "Kegiatans":
 			field := field
 
@@ -3376,6 +4823,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_Kegiatans(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "tKegSurvei":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tKegSurvei(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3785,6 +5254,95 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var tKegSurveiImplementors = []string{"tKegSurvei"}
+
+func (ec *executionContext) _tKegSurvei(ctx context.Context, sel ast.SelectionSet, obj *model.TKegSurvei) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tKegSurveiImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("tKegSurvei")
+		case "id":
+			out.Values[i] = ec._tKegSurvei_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "survei_kd":
+			out.Values[i] = ec._tKegSurvei_survei_kd(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "keg_kd":
+			out.Values[i] = ec._tKegSurvei_keg_kd(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._tKegSurvei_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "tgl_buka":
+			out.Values[i] = ec._tKegSurvei_tgl_buka(ctx, field, obj)
+		case "tgl_rek_mulai":
+			out.Values[i] = ec._tKegSurvei_tgl_rek_mulai(ctx, field, obj)
+		case "tgl_rek_selesai":
+			out.Values[i] = ec._tKegSurvei_tgl_rek_selesai(ctx, field, obj)
+		case "tgl_mulai":
+			out.Values[i] = ec._tKegSurvei_tgl_mulai(ctx, field, obj)
+		case "tgl_selesai":
+			out.Values[i] = ec._tKegSurvei_tgl_selesai(ctx, field, obj)
+		case "is_rekrutmen":
+			out.Values[i] = ec._tKegSurvei_is_rekrutmen(ctx, field, obj)
+		case "is_multi":
+			out.Values[i] = ec._tKegSurvei_is_multi(ctx, field, obj)
+		case "is_confirm":
+			out.Values[i] = ec._tKegSurvei_is_confirm(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "is_add_indicator":
+			out.Values[i] = ec._tKegSurvei_is_add_indicator(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "created_by":
+			out.Values[i] = ec._tKegSurvei_created_by(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "created_at":
+			out.Values[i] = ec._tKegSurvei_created_at(ctx, field, obj)
+		case "updated_by":
+			out.Values[i] = ec._tKegSurvei_updated_by(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._tKegSurvei_updated_at(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
@@ -3804,6 +5362,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNEditTKegSurvei2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐEditTKegSurvei(ctx context.Context, v interface{}) (model.EditTKegSurvei, error) {
+	res, err := ec.unmarshalInputEditTKegSurvei(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3811,6 +5374,53 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -3884,6 +5494,11 @@ func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋlutfiahdewiᚋgraphql
 
 func (ec *executionContext) unmarshalNNewKegiatan2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewKegiatan(ctx context.Context, v interface{}) (model.NewKegiatan, error) {
 	res, err := ec.unmarshalInputNewKegiatan(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewTKegSurvei2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐNewTKegSurvei(ctx context.Context, v interface{}) (model.NewTKegSurvei, error) {
+	res, err := ec.unmarshalInputNewTKegSurvei(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -4175,6 +5790,58 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) marshalNtKegSurvei2githubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx context.Context, sel ast.SelectionSet, v model.TKegSurvei) graphql.Marshaler {
+	return ec._tKegSurvei(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNtKegSurvei2ᚕᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx context.Context, sel ast.SelectionSet, v []*model.TKegSurvei) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOtKegSurvei2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalNtKegSurvei2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx context.Context, sel ast.SelectionSet, v *model.TKegSurvei) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._tKegSurvei(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4201,6 +5868,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -4214,6 +5897,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
 	return res
 }
 
@@ -4417,6 +6116,13 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		return graphql.Null
 	}
 	return ec.___Type(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOtKegSurvei2ᚖgithubᚗcomᚋlutfiahdewiᚋgraphqlᚑgoᚋgraphᚋmodelᚐTKegSurvei(ctx context.Context, sel ast.SelectionSet, v *model.TKegSurvei) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._tKegSurvei(ctx, sel, v)
 }
 
 // endregion ***************************** type.gotpl *****************************

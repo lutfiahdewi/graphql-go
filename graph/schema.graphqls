@@ -2,29 +2,14 @@
 #
 # https://gqlgen.com/getting-started/
 
+# Custom Scalar Type
+scalar Time
 
-
-type Kegiatan {
-  id: ID!
-  title: String!
-  status: String!
-  user: User!
-}
-
+# tUser section
 type User {
   id: ID!
   name: String!
 }
-
-type Query {
-  Kegiatans: [Kegiatan!]!
-}
-
-input NewKegiatan {
-  title: String!
-  status: String!
-}
-
 input RefreshTokenInput{
   token: String!
 }
@@ -39,12 +24,92 @@ input Login {
   password: String!
 }
 
+# kegiatan section
+type Kegiatan {
+  id: ID!
+  title: String!
+  status: String!
+  user: User!
+}
+
+input NewKegiatan {
+  title: String!
+  status: String!
+}
+
+# tKegSurvei section
+type tKegSurvei {
+  id: ID!
+  survei_kd: String!
+  keg_kd: String!
+  status: Int!
+  tgl_buka: Time
+  tgl_rek_mulai: Time
+  tgl_rek_selesai: Time
+  tgl_mulai: Time
+  tgl_selesai: Time
+  is_rekrutmen: Int
+  is_multi: Int
+  is_confirm: Boolean!
+  is_add_indicator: Boolean!
+  created_by: String!
+  created_at: Time
+  updated_by: String
+  updated_at: Time
+}
+
+input NewTKegSurvei{
+  survei_kd: String!
+  keg_kd: String!
+  status: Int!
+  tgl_buka: Time
+  tgl_rek_mulai: Time
+  tgl_rek_selesai: Time
+  tgl_mulai: Time
+  tgl_selesai: Time
+  is_rekrutmen: Int
+  is_multi: Int
+  is_confirm: Boolean!
+  is_add_indicator: Boolean!
+  created_by: String!
+}
+input EditTKegSurvei{
+  id: ID!
+  survei_kd: String!
+  keg_kd: String!
+  status: Int!
+  tgl_buka: Time
+  tgl_rek_mulai: Time
+  tgl_rek_selesai: Time
+  tgl_mulai: Time
+  tgl_selesai:Time
+  is_rekrutmen: Int
+  is_multi: Int
+  is_confirm: Boolean!
+  is_add_indicator: Boolean!
+  updated_by: String!
+}
+
+
+
+# All Query and Mutation section
+type Query {
+  Kegiatan(input: [ID!]!): [Kegiatan!]!
+  Kegiatans: [Kegiatan!]!
+  tKegSurvei: [tKegSurvei]!
+}
+
 type Mutation {
   createKegiatan(input: NewKegiatan!): Kegiatan!
-  editKegiatan(input: NewKegiatan!): Kegiatan!
-  deleteKegiatan(input: ID!): String!
   createUser(input: NewUser!): String!
   login(input: Login!): String!
   # we'll talk about this in authentication section
   refreshToken(input: RefreshTokenInput!): String!
+
+  # tKegSurvei
+  createTKegSurvei(input: NewTKegSurvei!): tKegSurvei!
+  editTKegSurvei(input: EditTKegSurvei!): tKegSurvei!
+  deleteTKegSurvei(input: ID!): String!
+
+
 }

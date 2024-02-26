@@ -1,0 +1,21 @@
+mutation{
+  createTKegSurvei(input:{
+    survei_kd:"default",
+    keg_kd:"kosongan",
+    status:0,
+    is_multi:0,
+    is_rekrutmen:0,
+    is_confirm:false,
+    is_add_indicator:false,
+    created_by:"admin",
+    tgl_buka: "1900-01-01T00:00:00.00000000Z",
+    tgl_mulai: "1900-01-01T00:00:00.000Z",
+    tgl_selesai: "1900-01-01T00:00:00Z",
+    tgl_rek_selesai: "1900-01-01T00:00:00Z",
+    tgl_rek_mulai: "1900-01-01T00:00:00+00:00"
+  }){
+    id,
+    created_by,
+    created_at,
+  }
+}

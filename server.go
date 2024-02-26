@@ -16,7 +16,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const defaultPort = "8060"
+const defaultPort = "8080" //alt 8060
 
 func main() {
 	port := os.Getenv("PORT")
@@ -56,6 +56,6 @@ func main() {
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", server)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Printf("🚀 Server listening at: to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

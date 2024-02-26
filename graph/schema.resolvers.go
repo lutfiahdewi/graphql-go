@@ -8,10 +8,12 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	// "log"
 
 	"github.com/lutfiahdewi/graphql-go/graph/model"
 	"github.com/lutfiahdewi/graphql-go/internal/auth"
 	"github.com/lutfiahdewi/graphql-go/internal/kegiatans"
+	"github.com/lutfiahdewi/graphql-go/internal/tKegSurveis"
 	"github.com/lutfiahdewi/graphql-go/internal/users"
 	"github.com/lutfiahdewi/graphql-go/pkg/jwt"
 )
@@ -22,7 +24,7 @@ func (r *mutationResolver) CreateKegiatan(ctx context.Context, input model.NewKe
 	if user == nil {
 		return &model.Kegiatan{}, fmt.Errorf("access denied")
 	}
-	
+
 	var kegiatan kegiatans.Kegiatan
 	kegiatan.Title = input.Title
 	kegiatan.Status = input.Status
@@ -37,16 +39,6 @@ func (r *mutationResolver) CreateKegiatan(ctx context.Context, input model.NewKe
 	// kegiatan.User = &users.User{ID: "4", Username: "User Dummy"}
 	var id int64 = kegiatan.Create() //should re-query the inserted row(??)
 	return &model.Kegiatan{ID: strconv.FormatInt(id, 10), Title: kegiatan.Title, Status: kegiatan.Status, User: graphqlUser}, nil
-}
-
-// EditKegiatan is the resolver for the editKegiatan field.
-func (r *mutationResolver) EditKegiatan(ctx context.Context, input model.NewKegiatan) (*model.Kegiatan, error) {
-	panic(fmt.Errorf("not implemented: EditKegiatan - editKegiatan"))
-}
-
-// DeleteKegiatan is the resolver for the deleteKegiatan field.
-func (r *mutationResolver) DeleteKegiatan(ctx context.Context, input string) (string, error) {
-	panic(fmt.Errorf("not implemented: DeleteKegiatan - deleteKegiatan"))
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -73,7 +65,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 		return "", &users.WrongUsernameOrPasswordError{}
 	}
 	token, err := jwt.GenerateToken(user.Username)
-	if err != nil{
+	if err != nil {
 		return "", err
 	}
 	return token, nil
@@ -92,11 +84,69 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 	return token, nil
 }
 
+// CreateTKegSurvei is the resolver for the createTKegSurvei field.
+func (r *mutationResolver) CreateTKegSurvei(ctx context.Context, input model.NewTKegSurvei) (*model.TKegSurvei, error) {
+	/*user := auth.ForContext(ctx)
+	if user == nil {
+		return &model.TKegSurvei{}, fmt.Errorf("access denied")
+	}*/
+	var tKegSurvei tKegSurveis.TKegSurvei
+	tKegSurvei.Survei_kd = input.SurveiKd
+	tKegSurvei.Keg_kd = input.KegKd
+	tKegSurvei.Status = input.Status
+	tKegSurvei.Tgl_buka = *input.TglBuka
+	tKegSurvei.Tgl_rek_mulai = *input.TglRekMulai
+	tKegSurvei.Tgl_rek_selesai = *input.TglRekSelesai
+	tKegSurvei.Tgl_mulai = *input.TglMulai
+	tKegSurvei.Tgl_selesai = *input.TglSelesai
+	tKegSurvei.Is_multi = *input.IsMulti
+	tKegSurvei.Is_rekrutmen = (*input.IsRekrutmen)
+	tKegSurvei.Is_add_indicator = input.IsAddIndicator
+	tKegSurvei.Is_confirm = input.IsConfirm
+	tKegSurvei.Created_by = input.CreatedBy
+
+	id := tKegSurvei.Create() //should re-query the inserted row(??)
+	return &model.TKegSurvei{
+		ID:             strconv.FormatInt(id, 10),
+		SurveiKd:       tKegSurvei.Survei_kd,
+		KegKd:          tKegSurvei.Keg_kd,
+		Status:         tKegSurvei.Status,
+		TglBuka:        &tKegSurvei.Tgl_buka,
+		TglRekMulai:    &tKegSurvei.Tgl_rek_mulai,
+		TglRekSelesai:  &tKegSurvei.Tgl_rek_selesai,
+		TglMulai:       &tKegSurvei.Tgl_mulai,
+		TglSelesai:     &tKegSurvei.Tgl_selesai,
+		IsRekrutmen:    &tKegSurvei.Is_rekrutmen,
+		IsMulti:        &tKegSurvei.Is_multi,
+		IsConfirm:      tKegSurvei.Is_confirm,
+		IsAddIndicator: tKegSurvei.Is_add_indicator,
+		CreatedBy:      tKegSurvei.Created_by,
+		// CreatedAt:      tKegSurvei.Created_at,
+		// UpdatedBy:      tKegSurvei.Tgl_buka,
+		// UpdatedAt:      tKegSurvei.Tgl_buka,
+	}, nil
+}
+
+// EditTKegSurvei is the resolver for the editTKegSurvei field.
+func (r *mutationResolver) EditTKegSurvei(ctx context.Context, input model.EditTKegSurvei) (*model.TKegSurvei, error) {
+	panic(fmt.Errorf("not implemented: EditTKegSurvei - editTKegSurvei"))
+}
+
+// DeleteTKegSurvei is the resolver for the deleteTKegSurvei field.
+func (r *mutationResolver) DeleteTKegSurvei(ctx context.Context, input string) (string, error) {
+	panic(fmt.Errorf("not implemented: DeleteTKegSurvei - deleteTKegSurvei"))
+}
+
+// Kegiatan is the resolver for the Kegiatan field.
+func (r *queryResolver) Kegiatan(ctx context.Context, input []string) ([]*model.Kegiatan, error) {
+	panic(fmt.Errorf("not implemented: Kegiatan - Kegiatan"))
+}
+
 // Kegiatans is the resolver for the Kegiatans field.
 func (r *queryResolver) Kegiatans(ctx context.Context) ([]*model.Kegiatan, error) {
 	var resultKegiatans []*model.Kegiatan
 	var dbKegiatans []kegiatans.Kegiatan = kegiatans.GetAll()
-	for _, kegiatan := range dbKegiatans{
+	for _, kegiatan := range dbKegiatans {
 		graphqlUser := &model.User{
 			ID:   kegiatan.User.ID,
 			Name: kegiatan.User.Username,
@@ -104,6 +154,11 @@ func (r *queryResolver) Kegiatans(ctx context.Context) ([]*model.Kegiatan, error
 		resultKegiatans = append(resultKegiatans, &model.Kegiatan{ID: kegiatan.ID, Title: kegiatan.Title, Status: kegiatan.Status, User: graphqlUser})
 	}
 	return resultKegiatans, nil
+}
+
+// TKegSurvei is the resolver for the tKegSurvei field.
+func (r *queryResolver) TKegSurvei(ctx context.Context) ([]*model.TKegSurvei, error) {
+	panic(fmt.Errorf("not implemented: TKegSurvei - tKegSurvei"))
 }
 
 // Mutation returns MutationResolver implementation.
@@ -114,3 +169,5 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+

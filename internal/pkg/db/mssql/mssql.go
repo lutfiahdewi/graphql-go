@@ -6,6 +6,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlserver"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	
 	"log"
 	"fmt"
 	"context"
@@ -51,12 +52,20 @@ func Migrate() {
 	if err := Db.Ping(); err != nil {
 		log.Fatal(err)
 	}
-	driver, _ := sqlserver.WithInstance(Db, &sqlserver.Config{})
-	m, _ := migrate.NewWithDatabaseInstance(
+	driver, err := sqlserver.WithInstance(Db, &sqlserver.Config{})
+	if err !=nil {
+		log.Fatal(err)
+	}
+	m, err := migrate.NewWithDatabaseInstance(
 		"file://internal/pkg/db/migrations/mssql",
+		// "file:///C:/Users/ASUS/Documents/coding etc/graphql-go/internal/pkg/db/migrations/mssql",
 		"sqlserver",
 		driver,
 	)
+	if err !=nil {
+		log.Fatal(err)
+	}
+	// m.Force(4)// Use this for versioning
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}
