@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+
 	// "log"
 
 	"github.com/lutfiahdewi/graphql-go/graph/model"
@@ -158,7 +159,28 @@ func (r *queryResolver) Kegiatans(ctx context.Context) ([]*model.Kegiatan, error
 
 // TKegSurvei is the resolver for the tKegSurvei field.
 func (r *queryResolver) TKegSurvei(ctx context.Context) ([]*model.TKegSurvei, error) {
-	panic(fmt.Errorf("not implemented: TKegSurvei - tKegSurvei"))
+	var resultTKegiatanSurveis []*model.TKegSurvei
+	var dbTKegSurveis []tKegSurveis.TKegSurvei = tKegSurveis.GetAll()
+	for _, tKegSurvei := range dbTKegSurveis {
+		resultTKegiatanSurveis = append(resultTKegiatanSurveis, &model.TKegSurvei{
+			ID:             tKegSurvei.ID,
+			SurveiKd:       tKegSurvei.Survei_kd,
+			KegKd:          tKegSurvei.Keg_kd,
+			Status:         tKegSurvei.Status,
+			TglBuka:        &tKegSurvei.Tgl_buka,
+			TglRekMulai:    &tKegSurvei.Tgl_rek_mulai,
+			TglRekSelesai:  &tKegSurvei.Tgl_rek_selesai,
+			TglMulai:       &tKegSurvei.Tgl_mulai,
+			TglSelesai:     &tKegSurvei.Tgl_selesai,
+			IsRekrutmen:    &tKegSurvei.Is_rekrutmen,
+			IsMulti:        &tKegSurvei.Is_multi,
+			IsConfirm:      tKegSurvei.Is_confirm,
+			IsAddIndicator: tKegSurvei.Is_add_indicator,
+			CreatedBy:      tKegSurvei.Created_by,
+			CreatedAt:      &tKegSurvei.Created_at,
+		})
+	}
+	return resultTKegiatanSurveis, nil
 }
 
 // Mutation returns MutationResolver implementation.
@@ -169,5 +191,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-

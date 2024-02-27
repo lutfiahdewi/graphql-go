@@ -2,6 +2,14 @@
 
 A graphql webservice made using go
 
+# Rule validation
+## Default value for input
+although some input are nullable in sql, for pass the input(argument) and making model there is no way to pass a nil pointer. To solve this problem, default value are made for each data type:
+* Time (datetime) : "1900-01-01T00:00:00.000Z"
+* String : "" (not tested)
+* int : 0
+* bool : false or 0
+
 # Port
 
 If 8080 blocked, try any port that not in this list
@@ -88,3 +96,4 @@ status
 ## sql statement
 ## model for the return argument
 Model cannot accept nil
+

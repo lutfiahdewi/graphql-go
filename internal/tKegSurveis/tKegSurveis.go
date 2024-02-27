@@ -1,6 +1,9 @@
 package tKegSurveis
 
 import (
+	"database/sql"
+	"strconv"
+
 	database "github.com/lutfiahdewi/graphql-go/internal/pkg/db/mssql"
 
 	"log"
@@ -15,7 +18,7 @@ import (
 5. Delete : delete a row*/
 
 type TKegSurvei struct {
-	ID               int       `json:"id"`
+	ID               string    `json:"id"`
 	Survei_kd        string    `json:"survei_kd"`
 	Keg_kd           string    `json:"keg_kd"`
 	Status           int       `json:"status"`
@@ -24,21 +27,17 @@ type TKegSurvei struct {
 	Tgl_rek_selesai  time.Time `json:"tgl_rek_selesai"`
 	Tgl_mulai        time.Time `json:"tgl_mulai"`
 	Tgl_selesai      time.Time `json:"tgl_selesai"`
-	Is_rekrutmen     int    `json:"is_rekrutmen"`
-	Is_multi         int    `json:"is_multi"`
+	Is_rekrutmen     int       `json:"is_rekrutmen"`
+	Is_multi         int       `json:"is_multi"`
 	Is_confirm       bool      `json:"Is_confirm"`
 	Is_add_indicator bool      `json:"Is_add_indicator"`
-	Created_by string `json:"created_by"` //ubah jd graph terhubung tUser
-	Created_at string `json:"created_at"`
-	Updated_by string `json:"uppdated_by"` //ubah jd graph terhubung tUser
-	Updated_at string `json:"updated_at"`
+	Created_by       string    `json:"created_by"` //ubah jd graph terhubung tUser
+	Created_at       time.Time `json:"created_at"`
+	Updated_by       string    `json:"uppdated_by"` //ubah jd graph terhubung tUser
+	Updated_at       time.Time `json:"updated_at"`
 }
 
-func GetAll() []TKegSurvei {
-	stmt, err := database.Db.Prepare("SELECT * FROM tKegSurvei") //spesifikasi kolom2nye
-	if err != nil {
-		log.Fatal(err)
-	}
+func runStmt(stmt *sql.Stmt) []TKegSurvei{
 	defer stmt.Close()
 	rows, err := stmt.Query()
 	if err != nil {
@@ -46,19 +45,64 @@ func GetAll() []TKegSurvei {
 	}
 	defer rows.Close()
 
-	var kegSurveis []TKegSurvei
+	var temp []TKegSurvei
 	for rows.Next() {
 		var kegSurvei TKegSurvei
-		err := rows.Scan(&kegSurvei.ID, &kegSurvei.Status, &kegSurvei.Tgl_buka) //krg lengkap
+		err := rows.Scan(
+			&kegSurvei.ID,
+			&kegSurvei.Survei_kd,
+			&kegSurvei.Keg_kd,
+			&kegSurvei.Status,
+			&kegSurvei.Tgl_buka,
+			&kegSurvei.Tgl_rek_mulai,
+			&kegSurvei.Tgl_rek_selesai,
+			&kegSurvei.Tgl_mulai,
+			&kegSurvei.Tgl_selesai,
+			&kegSurvei.Is_rekrutmen,
+			&kegSurvei.Is_multi,
+			&kegSurvei.Is_confirm,
+			&kegSurvei.Is_add_indicator,
+			&kegSurvei.Created_by,
+			&kegSurvei.Created_at,
+			/*&kegSurvei.Updated_by,
+			&kegSurvei.Updated_at,*/
+		)
 		if err != nil {
 			log.Fatal(err)
 		}
-		kegSurveis = append(kegSurveis, kegSurvei)
+		temp = append(temp, kegSurvei)
 	}
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
-	return kegSurveis
+	return temp
+}
+
+func GetAll() []TKegSurvei {
+	stmt, err := database.Db.Prepare("SELECT [ID],[survei_kd],[keg_kd],[status],[tgl_buka],[tgl_rek_mulai],[tgl_rek_selesai],[tgl_mulai],[tgl_selesai],[is_rekrutmen],[is_multi],[is_confirm],[is_add_indicator],[created_by],[created_at] FROM [dbo].[tKegSurvei]") //,[updated_by],[updated_at]
+	if err != nil {
+		log.Fatal(err)
+	}
+	return runStmt(stmt)
+}
+
+func Get(ids ...int64) []TKegSurvei {
+	if len(ids) == 0 {
+		return nil
+	}
+	whereStatement := " ID = "
+	for i, id := range ids {
+		whereStatement += strconv.FormatInt(id, 10)
+		if i < len(ids)-1 {
+			whereStatement += " OR ID="
+		}
+
+	}
+	stmt, err := database.Db.Prepare("SELECT [ID],[survei_kd],[keg_kd],[status],[tgl_buka],[tgl_rek_mulai],[tgl_rek_selesai],[tgl_mulai],[tgl_selesai],[is_rekrutmen],[is_multi],[is_confirm],[is_add_indicator],[created_by],[created_at] FROM [dbo].[tKegSurvei] WHERE" + whereStatement) //,[updated_by],[updated_at]
+	if err != nil {
+		log.Fatal(err)
+	}
+	return runStmt(stmt)
 }
 
 func (tKegSurvei TKegSurvei) Create() (lastInsertId int64) {
@@ -103,7 +147,7 @@ func Update() (TKegSurvei, error) {
 		log.Fatal("Prepare failed:", err.Error())
 	}
 	var kegSurvei TKegSurvei
-	kegSurvei.Updated_at = time.Now().Format(time.DateTime)
+	kegSurvei.Updated_at = time.Now()
 	res, err := statement.Exec(kegSurvei.Updated_at)
 	if err != nil {
 		log.Fatal(err)
